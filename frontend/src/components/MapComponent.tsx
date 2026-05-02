@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Trip } from '../services/trip.service';
+import { getCityCoordinates } from '../utils/citiesCoordinates';
 
 // Fix for default markers
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -62,20 +63,6 @@ const MapComponent: React.FC<MapComponentProps> = ({ trips, onMarkerClick }) => 
     }
   };
 
-  // Russian cities coordinates for mapping (simplified)
-  const russianCities: Record<string, [number, number]> = {
-    'Москва': [55.7558, 37.6173],
-    'Санкт-Петербург': [59.9343, 30.3351],
-    'Новосибирск': [55.0084, 82.9357],
-    'Екатеринбург': [56.8389, 60.6057],
-    'Казань': [55.7964, 49.1089],
-    'Нижний Новгород': [56.3269, 44.0076],
-    'Челябинск': [55.1644, 61.4368],
-    'Самара': [53.1959, 50.1002],
-    'Омск': [54.9914, 73.3686],
-    'Ростов-на-Дону': [47.2225, 39.7188],
-  };
-
   return (
     <div style={{ height: '600px', width: '100%', borderRadius: '8px', overflow: 'hidden' }}>
       <MapContainer
@@ -95,8 +82,12 @@ const MapComponent: React.FC<MapComponentProps> = ({ trips, onMarkerClick }) => 
           
           if (trip.latitude && trip.longitude) {
             coordinates = [trip.latitude, trip.longitude];
-          } else if (russianCities[trip.city]) {
-            coordinates = russianCities[trip.city];
+          } else {
+            // Используем утилиту для получения координат города
+            const cityCoords = getCityCoordinates(trip.city);
+            if (cityCoords) {
+              coordinates = [cityCoords.latitude, cityCoords.longitude];
+            }
           }
           
           if (!coordinates) return null;

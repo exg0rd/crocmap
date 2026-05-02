@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import MapComponent from '../components/MapComponent';
 import TripForm from '../components/TripForm';
+import PhotoGallery from '../components/PhotoGallery';
 import tripService, { Trip, CreateTripData, TripFilters } from '../services/trip.service';
 import authService from '../services/auth.service';
 import { format } from 'date-fns';
@@ -16,6 +17,7 @@ const DashboardPage: React.FC = () => {
   const [showTripForm, setShowTripForm] = useState(false);
   const [editingTrip, setEditingTrip] = useState<Trip | null>(null);
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
+  const [showPhotos, setShowPhotos] = useState(false);
   
   // Filters
   const [filters, setFilters] = useState<TripFilters>({});
@@ -197,6 +199,16 @@ const DashboardPage: React.FC = () => {
                   Редактировать
                 </button>
                 <button 
+                  onClick={() => {
+                    setShowPhotos(true);
+                    setSelectedTrip(null);
+                  }}
+                  className="btn"
+                  style={{ background: '#17a2b8', color: 'white' }}
+                >
+                  Фото
+                </button>
+                <button 
                   onClick={() => handleDeleteTrip(selectedTrip.id)}
                   className="btn btn-danger"
                 >
@@ -204,6 +216,17 @@ const DashboardPage: React.FC = () => {
                 </button>
               </div>
             </div>
+          )}
+
+          {showPhotos && selectedTrip && (
+            <PhotoGallery
+              tripId={selectedTrip.id}
+              tripCity={selectedTrip.city}
+              onClose={() => {
+                setShowPhotos(false);
+                setSelectedTrip(null);
+              }}
+            />
           )}
         </div>
 
